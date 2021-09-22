@@ -6,6 +6,7 @@ open System.Net
 open System.Net.Http
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc
+open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.StaticFiles
 open Microsoft.Extensions.Logging
 open Microsoft.Net.Http.Headers
@@ -14,28 +15,15 @@ open Microsoft.Net.Http.Headers
 [<Route("[controller]")>]
 type DocumentController(logger: ILogger<DocumentController>) =
     inherit ControllerBase()
-
-    let summaries =
-        [| "Freezing"
-           "Bracing"
-           "Chilly"
-           "Cool"
-           "Mild"
-           "Warm"
-           "Balmy"
-           "Hot"
-           "Sweltering"
-           "Scorching" |]
-
+    
     let dir = "./data/files"
 
     [<HttpPost>]
-    member _.Create(name: string, file: IFormFile) =
+    member _.Create(file: IFormFile) =
+        let name = file.FileName
         let filePath = Path.Combine(dir, name)
-
-
+        
         let pathExists () = Directory.Exists(dir)
-
         let createDir () =
             if not (pathExists ()) then
                 Directory.CreateDirectory(dir) |> ignore
@@ -54,8 +42,16 @@ type DocumentController(logger: ILogger<DocumentController>) =
         let content = provider.TryGetContentType(filePath)
         let mutable gotContentType, contentType = content
         if not gotContentType
-             then
-                 contentType = "application/octet-stream" |> ignore
+            then contentType = "application/octet-stream" |> ignore
         
         let bytes = File.ReadAllBytes(filePath);
         FileContentResult(bytes, contentType);
+    
+    [<HttpGet("GetAllFileNames")>]
+    member _.GetAllFileNames() =
+        Directory.GetFiles(dir) |> Array.map Path.GetFileName
+
+    [<HttpDelete>]
+    member _.Delete(name: string) =
+        let filePath = Path.Combine(dir, name)
+        File.Delete(filePath)
