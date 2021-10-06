@@ -26,7 +26,10 @@ type DocumentController(logger: ILogger<DocumentController>) =
 
     [<HttpGet("GetAllFileNames")>]
     member _.GetAllFileNames() =
-        service.GetAllFileNames()
+        async {
+            let! result = redis.GetAllNames()
+            return result
+        }
 
     [<HttpDelete>]
     member _.Delete(name: string) =

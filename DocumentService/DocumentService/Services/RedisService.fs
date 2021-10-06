@@ -26,5 +26,12 @@ type RedisService() =
                 db.RemoveAsync(name) |> Async.AwaitTask |> ignore
                 ()
             }
+			
+	member this.GetAllNames() =
+            async {
+
+                let! getAsync = db.GetByTagAsync<string>("file") |> Async.AwaitTask
+                return getAsync
+            }
 
 
