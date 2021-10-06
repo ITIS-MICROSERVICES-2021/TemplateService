@@ -5,14 +5,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="WeatherForecast.fs" />
-        <Compile Include="Controllers/WeatherForecastController.fs" />
+        <Compile Include="Interfaces\IDocumentService.fs" />
+        <Compile Include="Services\DocumentService.fs" />
+        <Compile Include="Services\RedisService.fs" />
         <Compile Include="Controllers\DocumentController.fs" />
         <Compile Include="Startup.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="MessagePack" Version="2.3.85" />
+      <PackageReference Include="StackExchange.Redis" Version="2.2.50" />
+      <PackageReference Include="StackExchange.Redis.Extensions.MsgPack" Version="7.1.1" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.2" />
     </ItemGroup>
 

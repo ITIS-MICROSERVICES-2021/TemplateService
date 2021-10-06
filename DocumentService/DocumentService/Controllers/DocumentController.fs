@@ -8,21 +8,29 @@ open Microsoft.Extensions.Logging
 [<Route("[controller]")>]
 type DocumentController(logger: ILogger<DocumentController>) =
     inherit ControllerBase()
-    
-    let service : IDocumentService = new DocumentService() :> IDocumentService
+
+    let service : IDocumentService = DocumentService() :> IDocumentService
+    let redis : RedisService = RedisService()
 
     [<HttpPost>]
     member _.Create(file: IFormFile) =
-        service.Create(file)
+        async {
+            service.Create(file)
+            do! redis.CreateName(file)
+        }
+
 
     [<HttpGet>]
     member _.Get(name: string) =
         service.Get(name)
-    
+
     [<HttpGet("GetAllFileNames")>]
     member _.GetAllFileNames() =
         service.GetAllFileNames()
 
     [<HttpDelete>]
     member _.Delete(name: string) =
-        service.Delete(name)
+        async {
+            service.Delete(name)
+            do! redis.DeleteName(name)
+        }
